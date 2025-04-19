@@ -23,8 +23,8 @@
       border-radius: 10px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       padding: 30px;
-      width: 90%;
-      max-width: 1000px;
+      width: 95%;
+      max-width: 1400px;
       text-align: center;
     }
 
@@ -35,7 +35,7 @@
     }
 
     .table-container {
-      max-height: 400px;
+      max-height: 500px;
       overflow-y: auto;
       margin-bottom: 20px;
     }
@@ -43,14 +43,16 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: auto;
       margin-bottom: 10px;
     }
 
     th, td {
-      padding: 8px;
+      padding: 10px;
       text-align: center;
       border: 1px solid #ddd;
       transition: background-color 0.2s ease;
+      min-width: 120px;
     }
 
     th {
@@ -140,17 +142,22 @@
       <table id="tabela">
         <thead>
           <tr>
-            <th>Código</th>
-            <th>Produto</th>
-            <th>Vendedor</th>
-            <th>Data de Entrega</th>
+            <th>Purchasing Document</th>
+            <th>Item</th>
+            <th>Material</th>
+            <th>Description</th>
+            <th>Document Date</th>
+            <th>Vendor</th>
+            <th>Vendor Name</th>
+            <th>Order Qty To Be Delivered</th>
+            <th>Requested Ship Date</th>
+            <th>Last Promise Delivery Date</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
+            <td></td><td></td><td></td><td></td><td></td>
+            <td></td><td></td><td></td><td></td>
             <td><input type="date"></td>
           </tr>
         </tbody>
@@ -179,7 +186,7 @@
       authDomain: "agendamentoatlas-be540.firebaseapp.com",
       databaseURL: "https://agendamentoatlas-be540-default-rtdb.firebaseio.com",
       projectId: "agendamentoatlas-be540",
-      storageBucket: "agendamentoatlas-be540.firebasestorage.app",
+      storageBucket: "agendamentoatlas-be540.appspot.com",
       messagingSenderId: "126424910599",
       appId: "1:126424910599:web:bd9deb2ea0294819ab13a2"
     };
@@ -192,12 +199,10 @@
       const linhas = Array.from(document.querySelectorAll('#tabela tbody tr'));
       const dados = linhas.map(tr => {
         const tds = tr.querySelectorAll('td');
-        return [
-          tds[0].textContent.trim(),
-          tds[1].textContent.trim(),
-          tds[2].textContent.trim(),
-          tds[3].querySelector('input')?.value || ''
-        ];
+        return Array.from(tds).map((td, i) => {
+          if (i === 9) return td.querySelector('input')?.value || '';
+          return td.textContent.trim();
+        });
       }).filter(linha => linha.some(valor => valor !== ''));
       set(tabelaRef, dados);
     }
@@ -213,36 +218,29 @@
           linha.forEach((valor, i) => {
             const td = document.createElement('td');
             td.style.textAlign = 'center';
-
-            if (i === 3) {
+            if (i === 9) {
               const input = document.createElement('input');
               input.type = 'date';
               input.value = valor || '';
               input.addEventListener('change', salvarTabela);
               td.appendChild(input);
             } else {
-              td.contentEditable = true;
               td.textContent = valor || '';
-              td.addEventListener('input', salvarTabela);
             }
-
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
         });
       } else {
-        // Se estiver vazio, cria linha inicial
         const tr = document.createElement('tr');
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 10; i++) {
           const td = document.createElement('td');
-          if (i === 3) {
+          td.style.textAlign = 'center';
+          if (i === 9) {
             const input = document.createElement('input');
             input.type = 'date';
             input.addEventListener('change', salvarTabela);
             td.appendChild(input);
-          } else {
-            td.contentEditable = true;
-            td.addEventListener('input', salvarTabela);
           }
           tr.appendChild(td);
         }
@@ -264,21 +262,26 @@
         const linha = [];
         const tds = tr.querySelectorAll('td');
         tds.forEach((td, index) => {
-          if (index === 3) {
+          if (index === 9) {
             const input = td.querySelector('input');
-            linha.push(input ? input.value : '');
+            if (input && input.value) {
+              const [yyyy, mm, dd] = input.value.split('-');
+              linha.push(`${dd}.${mm}.${yyyy}`);
+            } else {
+              linha.push('');
+            }
           } else {
             linha.push(td.textContent.trim());
           }
         });
-        if (linha[3]) {
+        if (linha[9]) {
           dados.push(linha);
         }
       });
 
       if (dados.length > 0) {
         const ws = XLSX.utils.aoa_to_sheet([
-          ['Código', 'Produto', 'Vendedor', 'Data de Entrega'],
+          ['Purchasing Document','Item','Material','Description','Document Date','Vendor','Vendor Name','Order Qty To Be Delivered','Requested Ship Date','Last Promise Delivery Date'],
           ...dados
         ]);
         XLSX.utils.book_append_sheet(wb, ws, 'Agendamento');
@@ -303,19 +306,17 @@
 
           for (let i = 1; i < linhas.length; i++) {
             const tr = document.createElement('tr');
-            for (let j = 0; j < 4; j++) {
+            for (let j = 0; j < 10; j++) {
               const td = document.createElement('td');
               td.style.textAlign = 'center';
-              if (j === 3) {
+              if (j === 9) {
                 const input = document.createElement('input');
                 input.type = 'date';
                 input.value = linhas[i][j] || '';
                 input.addEventListener('change', salvarTabela);
                 td.appendChild(input);
               } else {
-                td.contentEditable = true;
                 td.textContent = linhas[i][j] || '';
-                td.addEventListener('input', salvarTabela);
               }
               tr.appendChild(td);
             }
