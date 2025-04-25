@@ -2,184 +2,81 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabela de Agendamento</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <title>Login de Acesso</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f3f4f7;
-      margin: 0;
-      padding: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      width: 95%;
-      max-width: 1400px;
+      font-family: Arial, sans-serif;
       text-align: center;
+      padding: 50px;
     }
-
-    h2 {
-      color: #4CAF50;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    .table-container {
-      max-height: 500px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: auto;
-      margin-bottom: 10px;
-    }
-
-    th, td {
+    input {
       padding: 10px;
-      text-align: center;
-      border: 1px solid #ddd;
-      transition: background-color 0.2s ease;
-      min-width: 120px;
+      font-size: 16px;
     }
-
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #mainContent {
+      display: none;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
     th {
       background-color: #f2f2f2;
     }
-
-    tbody tr:hover {
-      background-color: #e0f7fa;
-    }
-
-    input[type="date"] {
-      width: 100%;
-      padding: 4px 6px;
-      border: none;
-      outline: none;
-      font-family: inherit;
-      font-size: 14px;
-      text-align: center;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .btn, .back-btn, .input-file label {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      font-size: 14px;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-
-    .btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .btn:hover {
-      background-color: #45a049;
-      transform: scale(1.05);
-    }
-
-    .input-file input[type="file"] {
+    .admin-buttons {
       display: none;
-    }
-
-    .input-file label {
-      background-color: #007BFF;
-      color: white;
-    }
-
-    .input-file label:hover {
-      background-color: #0056b3;
-      transform: scale(1.05);
-    }
-
-    .back-btn {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    .back-btn:hover {
-      background-color: #c82333;
-      transform: scale(1.05);
-    }
-
-    .btn i, .back-btn i, .input-file label i {
-      margin-right: 8px;
     }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <h2>Tabela de Agendamento</h2>
-
-    <div class="table-container">
-      <table id="tabela">
-        <thead>
-          <tr>
-            <th>Purchasing Document</th>
-            <th>Item</th>
-            <th>Material</th>
-            <th>Description</th>
-            <th>Document Date</th>
-            <th>Vendor</th>
-            <th>Vendor Name</th>
-            <th>Order Qty To Be Delivered</th>
-            <th>Requested Ship Date</th>
-            <th>Last Promise Delivery Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td><td></td><td></td><td></td><td></td>
-            <td></td><td></td><td></td><td></td>
-            <td><input type="date"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="button-container">
-      <button class="btn" onclick="exportarExcel()"><i class="fas fa-file-export"></i> Exportar para Excel</button>
-
-      <div class="input-file">
-        <input type="file" id="importarArquivo" accept=".xlsx" onchange="importarExcel(event)">
-        <label for="importarArquivo"><i class="fas fa-file-import"></i> Importar de Excel</label>
-      </div>
-    </div>
-
-    <button class="back-btn" onclick="voltar()"><i class="fas fa-arrow-left"></i> Voltar</button>
+  <div id="loginScreen">
+    <h2>Digite o código do Vendor</h2>
+    <input type="text" id="vendorCodeLogin" placeholder="Código do Vendor">
+    <br>
+    <button onclick="enterSystem()">Entrar</button>
   </div>
 
-  <!-- Firebase -->
+  <div id="mainContent">
+    <h2>Tabela de Dados</h2>
+    <div class="admin-buttons" id="adminButtons">
+      <input type="file" id="inputExcel" accept=".xlsx" onchange="handleFile(event)">
+      <button onclick="exportToExcel()">Exportar para Excel</button>
+    </div>
+    <button onclick="backToLogin()">Voltar</button>
+    <br><br>
+
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Purchasing Document</th>
+          <th>Item</th>
+          <th>Material</th>
+          <th>Description</th>
+          <th>Document Date</th>
+          <th>Vendor</th>
+          <th>Vendor Name</th>
+          <th>Order Qty To Be Delivered</th>
+          <th>Requested Ship Date</th>
+          <th>Last Promise Delivery Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, set, update, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDLf0rKSgfMD956cGGgSIsv56Vbq_FZ3_w",
@@ -192,160 +89,144 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const tabelaRef = ref(database, "tabelaAgendamento");
+    const db = getDatabase(app);
+    const table = document.querySelector("#dataTable tbody");
+    const adminButtons = document.getElementById("adminButtons");
+    let vendorCode = "";
 
-    // Recuperar código passado via localStorage
-    const codigo = localStorage.getItem("codigoAcesso");
-
-    function salvarTabela() {
-      const linhas = Array.from(document.querySelectorAll('#tabela tbody tr'));
-      const dados = linhas.map(tr => {
-        const tds = tr.querySelectorAll('td');
-        return Array.from(tds).map((td, i) => {
-          if (i === 9) return td.querySelector('input')?.value || '';
-          return td.textContent.trim();
-        });
-      }).filter(linha => linha.some(valor => valor !== ''));
-      set(tabelaRef, dados);
+    function getRowKey(rowData) {
+      return `${rowData[0]}_${rowData[1]}`;
     }
 
-    onValue(tabelaRef, snapshot => {
-      const dados = snapshot.val();
-      const tbody = document.querySelector('#tabela tbody');
-      tbody.innerHTML = '';
-
-      // Mostrar ou ocultar botões com base no código
-      const botoes = document.querySelector('.button-container');
-      if (codigo !== "atlas2025") {
-        botoes.style.display = "none";
-      } else {
-        botoes.style.display = "flex";
+    function formatExcelDate(value) {
+      if (typeof value === 'number') {
+        const date = new Date((value - 25569) * 86400 * 1000);
+        return date.toISOString().split('T')[0];
       }
+      return value || '';
+    }
 
-      if (dados) {
-        dados.forEach(linha => {
-          const vendor = linha[5]?.trim(); // Coluna Vendor
-          if (codigo === "atlas2025" || vendor === codigo) {
-            const tr = document.createElement('tr');
-            linha.forEach((valor, i) => {
-              const td = document.createElement('td');
-              td.style.textAlign = 'center';
-              if (i === 9) {
-                const input = document.createElement('input');
-                input.type = 'date';
-                input.value = valor || '';
-                input.addEventListener('change', salvarTabela);
-                td.appendChild(input);
-              } else {
-                td.textContent = valor || '';
-              }
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-          }
-        });
-      } else {
-        const tr = document.createElement('tr');
-        for (let i = 0; i < 10; i++) {
-          const td = document.createElement('td');
-          td.style.textAlign = 'center';
-          if (i === 9) {
-            const input = document.createElement('input');
-            input.type = 'date';
-            input.addEventListener('change', salvarTabela);
-            td.appendChild(input);
-          }
-          tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-      }
-    });
+    function formatExportDate(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}.${month}.${year}`;
+    }
 
-    window.salvarTabela = salvarTabela;
-  </script>
-
-  <script>
-    function exportarExcel() {
-      const tabela = document.getElementById('tabela');
-      const wb = XLSX.utils.book_new();
-      const dados = [];
-
-      const linhas = tabela.querySelectorAll('tbody tr');
-      linhas.forEach(tr => {
-        const linha = [];
-        const tds = tr.querySelectorAll('td');
-        tds.forEach((td, index) => {
-          if (index === 9) {
-            const input = td.querySelector('input');
-            if (input && input.value) {
-              const [yyyy, mm, dd] = input.value.split('-');
-              linha.push(`${dd}.${mm}.${yyyy}`);
-            } else {
-              linha.push('');
+    function loadFromFirebase() {
+      onValue(ref(db, "tabela"), (snapshot) => {
+        const data = snapshot.val();
+        table.innerHTML = '';
+        for (const key in data) {
+          const rowData = data[key];
+          if (!vendorCode || rowData.vendor === vendorCode || vendorCode === "atlas2025") {
+            const row = table.insertRow();
+            const values = [
+              rowData.purchasingDocument,
+              rowData.item,
+              rowData.material,
+              rowData.description,
+              rowData.documentDate,
+              rowData.vendor,
+              rowData.vendorName,
+              rowData.orderQtyToBeDelivered,
+              rowData.requestedShipDate
+            ];
+            for (let i = 0; i < values.length; i++) {
+              const cell = row.insertCell();
+              cell.textContent = values[i] || '';
             }
-          } else {
-            linha.push(td.textContent.trim());
+            const inputCell = row.insertCell();
+            const input = document.createElement("input");
+            input.type = "date";
+            input.value = rowData.lastPromiseDeliveryDate || '';
+            input.addEventListener("change", () => {
+              update(ref(db, "tabela/" + key), {
+                lastPromiseDeliveryDate: input.value
+              });
+            });
+            inputCell.appendChild(input);
           }
-        });
-        if (linha[9]) {
-          dados.push(linha);
         }
       });
-
-      if (dados.length > 0) {
-        const ws = XLSX.utils.aoa_to_sheet([
-          ['Purchasing Document','Item','Material','Description','Document Date','Vendor','Vendor Name','Order Qty To Be Delivered','Requested Ship Date','Last Promise Delivery Date'],
-          ...dados
-        ]);
-        XLSX.utils.book_append_sheet(wb, ws, 'Agendamento');
-        XLSX.writeFile(wb, 'agendamento.xlsx');
-      } else {
-        alert('Não há dados com data para exportar.');
-      }
     }
 
-    function importarExcel(event) {
-      const arquivo = event.target.files[0];
-      const leitor = new FileReader();
-      leitor.onload = function(e) {
-        const dados = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(dados, { type: 'array' });
-        const primeiraAba = workbook.Sheets[workbook.SheetNames[0]];
-        const linhas = XLSX.utils.sheet_to_json(primeiraAba, { header: 1 });
+    window.enterSystem = function () {
+      vendorCode = document.getElementById("vendorCodeLogin").value.trim();
+      if (!vendorCode) return;
 
-        if (linhas.length > 1) {
-          const tbody = document.querySelector('#tabela tbody');
-          tbody.innerHTML = '';
+      get(ref(db, 'tabela')).then(snapshot => {
+        const data = snapshot.val();
+        const values = Object.values(data || {});
+        const vendorExists = vendorCode === "atlas2025" || values.some(row => row.vendor === vendorCode);
 
-          for (let i = 1; i < linhas.length; i++) {
-            const tr = document.createElement('tr');
-            for (let j = 0; j < 10; j++) {
-              const td = document.createElement('td');
-              td.style.textAlign = 'center';
-              if (j === 9) {
-                const input = document.createElement('input');
-                input.type = 'date';
-                input.value = linhas[i][j] || '';
-                input.addEventListener('change', salvarTabela);
-                td.appendChild(input);
-              } else {
-                td.textContent = linhas[i][j] || '';
-              }
-              tr.appendChild(td);
-            }
-            tbody.appendChild(tr);
-          }
-
-          salvarTabela(); // salva os dados importados
+        if (!vendorExists) {
+          alert("Código inválido. Tente novamente.");
+          return;
         }
-      };
-      leitor.readAsArrayBuffer(arquivo);
-    }
 
-    function voltar() {
-      window.location.href = "index.html";
-    }
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+        adminButtons.style.display = vendorCode === "atlas2025" ? "block" : "none";
+
+        loadFromFirebase();
+      });
+    };
+
+    window.backToLogin = function () {
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("vendorCodeLogin").value = "";
+      table.innerHTML = "";
+    };
+
+    window.handleFile = function (e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const updates = {};
+        for (let i = 1; i < json.length; i++) {
+          const row = json[i];
+          const key = getRowKey(row);
+          updates[key] = {
+            purchasingDocument: row[0] || '',
+            item: row[1] || '',
+            material: row[2] || '',
+            description: row[3] || '',
+            documentDate: formatExcelDate(row[4]),
+            vendor: row[5] || '',
+            vendorName: row[6] || '',
+            orderQtyToBeDelivered: row[7] || '',
+            requestedShipDate: formatExcelDate(row[8]),
+            lastPromiseDeliveryDate: formatExcelDate(row[9])
+          };
+        }
+        set(ref(db, "tabela"), updates).then(() => loadFromFirebase());
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    window.exportToExcel = function () {
+      const wb = XLSX.utils.book_new();
+      const rows = [[...document.querySelectorAll("thead th")].map(th => th.textContent)];
+      for (const tr of document.querySelectorAll("tbody tr")) {
+        const row = [];
+        for (let i = 0; i < 9; i++) {
+          row.push(tr.cells[i].textContent);
+        }
+        const dateValue = tr.cells[9].querySelector("input").value;
+        row.push(formatExportDate(dateValue));
+        rows.push(row);
+      }
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "Dados");
+      XLSX.writeFile(wb, "tabela.xlsx");
+    };
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
